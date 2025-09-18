@@ -1,12 +1,6 @@
 streamlit
 python-dotenv
 requests
-numpy
-pandas
-langchain-community
-openai
-langchain
-langchain-openai
 streamlit-chat
 anthropic
 langchain_anthropic
@@ -15,3 +9,4 @@ streamlit-autorefresh
 streamlit-cookies-controller
 transformers 
 torch
+unsloth
