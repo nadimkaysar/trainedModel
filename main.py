@@ -1,6 +1,10 @@
 import streamlit as st
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+from huggingface_hub import login
+
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+login(OPENAI_API_KEY)
 
 # Model
 model_name = "kaysarjp/mentalproblem"
