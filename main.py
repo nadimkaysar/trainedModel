@@ -13,7 +13,7 @@ model_name = "kaysarjp/mentalproblem"
 import torch
 import streamlit as st
 print(torch.__version__)
-print(torch.cuda.is_available())
+#print(torch.cuda.is_available())
 st.write("hello")
 # # Load tokenizer
 # tokenizer = AutoTokenizer.from_pretrained(model_name)
