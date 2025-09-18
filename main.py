@@ -16,7 +16,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 # Load 4-bit quantized model
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
-    device_map="auto",          # automatically spread across available devices
+    device_map="cuda",          # automatically spread across available devices
     load_in_4bit=True,          # this enables 4-bit quantization
     torch_dtype=torch.float16,  # recommended for 4-bit
 )
