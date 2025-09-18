@@ -3,7 +3,8 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 # Model
-model_name = "kaysarjp/mentalproblem"
+# model_name = "kaysarjp/mentalproblem"
+model_name = "google/gemma-3n-E2B-it-litert-lm"
 
 # Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
