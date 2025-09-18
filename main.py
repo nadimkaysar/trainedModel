@@ -1,6 +1,6 @@
 import streamlit as st
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, TextStreamer
 from huggingface_hub import login
 
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -13,20 +13,22 @@ model_name = "kaysarjp/mentalproblem"
 # Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-# Load 4-bit quantized model
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    device_map="cuda",          # automatically spread across available devices
-    load_in_4bit=True,          # this enables 4-bit quantization
-    torch_dtype=torch.float16,  # recommended for 4-bit
+# Define 4-bit quantization config
+quant_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",        # nf4 is recommended
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.bfloat16,  # or torch.float16 if GPU doesn’t support bf16
 )
 
-# Build a text generation pipeline
-generator = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
+# Load quantized model
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",          # auto device placement
+    quantization_config=quant_config,
+    dtype=torch.bfloat16,       # instead of torch_dtype
 )
+
 
 
 # Streamlitアプリの設定
@@ -43,20 +45,25 @@ user_input = st.text_input("You: ", "")
 
 if user_input:
   
-    messages = [{"role" : "user", "content" : user_input }]
-
+    messages = [{"role": "user", "content": user_input}]
     text = tokenizer.apply_chat_template(
         messages,
-        tokenize = False,
-        add_generation_prompt = True, # Must add for generation
+        tokenize=False,
+        add_generation_prompt=True,
     )
 
-    from transformers import TextStreamer
-    response = model.generate(
-        **tokenizer(text, return_tensors = "pt").to("device"),
-        max_new_tokens = 1000, # Increase for longer outputs!
-        temperature = 0.7, top_p = 0.8, top_k = 20, # For non thinking
-        streamer = TextStreamer(tokenizer, skip_prompt = True),
+    # Stream output
+    streamer = TextStreamer(tokenizer, skip_prompt=True)
+
+    input_ids = tokenizer(text, return_tensors="pt").to(model.device)
+
+    response_ids = model.generate(
+        **input_ids,
+        max_new_tokens=500,
+        temperature=0.7,
+        top_p=0.8,
+        top_k=20,
+        streamer=streamer,
     )
 
     # チャット履歴にユーザー入力とモデルの応答を追加
