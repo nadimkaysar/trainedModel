@@ -38,10 +38,9 @@ user_input = st.text_input("You: ", "")
 
 if user_input:
   
-  messages = [
-    {"role" : "user", "content" : user_input }]
+  messages = [{"role" : "user", "content" : user_input }]
 
-    text = tokenizer.apply_chat_template(
+ text = tokenizer.apply_chat_template(
     messages,
     tokenize = False,
     add_generation_prompt = True, # Must add for generation
