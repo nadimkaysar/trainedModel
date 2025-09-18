@@ -13,4 +13,5 @@ langchain_anthropic
 psycopg2-binary
 streamlit-autorefresh
 streamlit-cookies-controller
-transformers torch
+transformers 
+torch
